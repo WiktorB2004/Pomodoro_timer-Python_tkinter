@@ -3,24 +3,86 @@ from tkinter import *
 from tkinter import ttk
 
 
-# Window in which you can set amount of rounds and learning and break time
-def menu():
-    pass
-
-
-# Window in which you see countdown and rounds left
-def learn_timer():
-    pass
-
-
 # Window in which you see break time
 def break_timer():
     pass
 
 
 # Countdown function
-def countdown(time):
+def countdown():
     pass
 
 
+# Window in which you see countdown and rounds left
+def learn_timer(rounds, time, break_time):
+    h, m, s = time
+    pass
+
+
+# Window in which you can set amount of rounds and learning and break time
+def menu():
+    menu = Tk()
+    menu.title("Pomodoro timer")
+
+    mainframe = ttk.Frame(menu)
+    mainframe.pack(expand="True", padx=36, pady=36)
+    rounds = StringVar(value=0)
+    hours = StringVar(value=0)
+    minutes = StringVar(value=0)
+    seconds = StringVar(value=0)
+    break_time = StringVar(value=0)
+
+    rounds_label = ttk.Label(mainframe, text="Number of rounds").pack()
+    rounds_entry = ttk.Entry(mainframe, textvariable=rounds, width="5").pack()
+
+    time_entry_frame = LabelFrame(mainframe, border=0, padx=10, pady=10)
+    time_entry_frame.pack()
+    time_label = ttk.Label(time_entry_frame, text="Learning time").grid(column=1, row=0)
+    hours_label = ttk.Label(time_entry_frame, text="hours").grid(column=0, row=1)
+    minutes_label = ttk.Label(time_entry_frame, text="minutes").grid(column=1, row=1)
+    seconds_label = ttk.Label(time_entry_frame, text="seconds").grid(column=2, row=1)
+    hours_entry = ttk.Spinbox(
+        time_entry_frame,
+        from_=0,
+        to=60,
+        width=5,
+        wrap=True,
+        textvariable=hours,
+        command=lambda: hours.set(hours.get()),
+    ).grid(column=0, row=2)
+    minutes_entry = ttk.Spinbox(
+        time_entry_frame,
+        from_=0,
+        to=60,
+        width=5,
+        wrap=True,
+        textvariable=minutes,
+        command=lambda: minutes.set(minutes.get()),
+    ).grid(column=1, row=2)
+    seconds_entry = ttk.Spinbox(
+        time_entry_frame,
+        from_=0,
+        to=60,
+        width=5,
+        wrap=True,
+        textvariable=seconds,
+        command=lambda: seconds.set(seconds.get()),
+    ).grid(column=2, row=2)
+
+    break_time_label = ttk.Label(mainframe, text="Break time").pack()
+    break_time_entry = ttk.Entry(mainframe, textvariable=break_time, width=5).pack()
+
+    submit_button = ttk.Button(
+        mainframe,
+        text="Start",
+        command=lambda: learn_timer(
+            rounds.get(), [hours.get(), minutes.get(), seconds.get()], break_time.get()
+        ),
+    ).pack(pady=15)
+    menu.mainloop()
+
+
 # TODO: Create Window with todo list, summary and GUI with all components working together
+
+if __name__ == "__main__":
+    menu()
