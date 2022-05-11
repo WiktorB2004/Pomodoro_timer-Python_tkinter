@@ -9,14 +9,53 @@ def break_timer():
 
 
 # Countdown function
-def countdown():
+def countdown(hours_label, minutes_label, seconds_label, h, m, s):
     pass
+
+
+# Pausing button function
+def pause(btn):
+    if btn["text"] == "Unpause":
+        btn["text"] = "Pause"
+    else:
+        btn["text"] = "Unpause"
 
 
 # Window in which you see countdown and rounds left
 def learn_timer(rounds, time, break_time):
     h, m, s = time
-    pass
+    timer_win = Tk()
+    timer_win.title("Timer")
+    mainframe = ttk.Frame(timer_win)
+    mainframe.pack(expand="True", padx=36, pady=36)
+
+    hours = StringVar(value=h)
+    minutes = StringVar(value=m)
+    seconds = StringVar(value=s)
+
+    main_text = ttk.Label(mainframe, text="Counting down...").pack()
+    rounds_text = ttk.Label(mainframe, text=f"Rounds left: {rounds}").pack()
+
+    timer_frame = LabelFrame(mainframe, border=0, padx=0, pady=0)
+    timer_frame.pack()
+    hours_text = ttk.Label(timer_frame, text="Hours")
+    hours_text.grid(column=0, row=0, padx=5)
+    minutes_text = ttk.Label(timer_frame, text="Minutes").grid(column=1, row=0, padx=5)
+    seconds_text = ttk.Label(timer_frame, text="Seconds").grid(column=2, row=0, padx=5)
+    hours_label = ttk.Label(timer_frame, text=hours.get())
+    hours_label.grid(column=0, row=1, padx=5)
+    minutes_label = ttk.Label(timer_frame, text=minutes.get())
+    minutes_label.grid(column=1, row=1, padx=5)
+    seconds_label = ttk.Label(timer_frame, text=seconds.get())
+    seconds_label.grid(column=2, row=1, padx=5)
+    pause_button = ttk.Button(
+        timer_frame,
+        text="Pause",
+        command=lambda: pause(pause_button),
+    )
+    pause_button.grid(column=1, row=2, padx=5, pady=10)
+    countdown(hours_label, minutes_label, seconds_label, h, m, s)
+    timer_win.mainloop()
 
 
 # Window in which you can set amount of rounds and learning and break time
@@ -75,11 +114,16 @@ def menu():
     submit_button = ttk.Button(
         mainframe,
         text="Start",
-        command=lambda: learn_timer(
-            rounds.get(), [hours.get(), minutes.get(), seconds.get()], break_time.get()
-        ),
+        command=lambda: [
+            menu.destroy(),
+            learn_timer(
+                rounds.get(),
+                [hours.get(), minutes.get(), seconds.get()],
+                break_time.get(),
+            ),
+        ],
     ).pack(pady=15)
-    menu.mainloop()
+    mainloop()
 
 
 # TODO: Create Window with todo list, summary and GUI with all components working together
