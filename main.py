@@ -3,20 +3,20 @@ from tkinter import *
 from tkinter import ttk
 import time
 
-
-# Window in which you see break time
-def break_timer(break_time, rounds):
-    pass
-
-
 # Countdown function
 def countdown(
-    win, hours_label, minutes_label, seconds_label, time_values, break_time, rounds
+    win,
+    hours_label,
+    minutes_label,
+    seconds_label,
+    time_values=[0, 0, 0],
+    break_time=1,
+    rounds=1,
+    sequence="",
+    learn_time=[0, 1, 0],
 ):
     h, m, s = time_values
     try:
-        # the input provided by the user is
-        # stored in here :temp
         temp = h * 3600 + m * 60 + s
     except:
         raise ValueError("Please input valid value")
@@ -32,24 +32,100 @@ def countdown(
 
         win.update()
         time.sleep(1)
-
         if temp == 0:
             win.destroy()
-            rounds.set(int(rounds.get()) - 1)
-            break_timer(break_time, rounds)
-
+            if int(rounds.get()) > 1 and sequence == "break":
+                rounds.set(int(rounds.get()) - 1)
+                break_timer(break_time, rounds, learn_time)
+            elif int(rounds.get()) > 0 and sequence == "learn":
+                learn_timer(rounds, learn_time, break_time)
         temp -= 1
 
 
-# Pausing button function
+# Pausing function
 def pause(btn):
-    if btn["text"] == "Unpause":
+    if btn["text"] == "Unpause" or btn["text"] == "Start":
         btn["text"] = "Pause"
     else:
         btn["text"] = "Unpause"
 
 
-# Window in which you see countdown and rounds left
+# Window in which user can set amount of rounds,learning time and break time, 1st window that user sees
+def menu():
+    menu = Tk()
+    menu.title("Pomodoro timer")
+
+    mainframe = ttk.Frame(menu)
+    mainframe.pack(expand="True", padx=36, pady=36)
+    rounds = StringVar(value=1)
+    hours = StringVar(value=0)
+    minutes = StringVar(value=0)
+    seconds = StringVar(value=0)
+    break_time = StringVar(value=1)
+
+    rounds_label = ttk.Label(mainframe, text="Number of rounds").pack()
+    rounds_entry = ttk.Entry(
+        mainframe, textvariable=rounds, width=4, justify="center"
+    ).pack()
+
+    time_entry_frame = LabelFrame(mainframe, border=0, padx=10, pady=10)
+    time_entry_frame.pack()
+    time_label = ttk.Label(time_entry_frame, text="Learning time").grid(column=1, row=0)
+    hours_label = ttk.Label(time_entry_frame, text="hours").grid(column=0, row=1)
+    minutes_label = ttk.Label(time_entry_frame, text="minutes").grid(column=1, row=1)
+    seconds_label = ttk.Label(time_entry_frame, text="seconds").grid(column=2, row=1)
+    hours_entry = ttk.Spinbox(
+        time_entry_frame,
+        from_=0,
+        to=60,
+        width=4,
+        wrap=True,
+        textvariable=hours,
+        command=lambda: hours.set(hours.get()),
+        justify="center",
+    ).grid(column=0, row=2)
+    minutes_entry = ttk.Spinbox(
+        time_entry_frame,
+        from_=0,
+        to=60,
+        width=4,
+        wrap=True,
+        textvariable=minutes,
+        command=lambda: minutes.set(minutes.get()),
+        justify="center",
+    ).grid(column=1, row=2)
+    seconds_entry = ttk.Spinbox(
+        time_entry_frame,
+        from_=0,
+        to=60,
+        width=4,
+        wrap=True,
+        textvariable=seconds,
+        command=lambda: seconds.set(seconds.get()),
+        justify="center",
+    ).grid(column=2, row=2)
+
+    break_time_label = ttk.Label(mainframe, text="Break time (minutes)").pack()
+    break_time_entry = ttk.Entry(
+        mainframe, textvariable=break_time, width=5, justify="center"
+    ).pack()
+
+    submit_button = ttk.Button(
+        mainframe,
+        text="Start",
+        command=lambda: [
+            menu.destroy(),
+            learn_timer(
+                rounds,
+                [hours.get(), minutes.get(), seconds.get()],
+                break_time.get(),
+            ),
+        ],
+    ).pack(pady=15)
+    menu.mainloop()
+
+
+# Window in which you see countdown and rounds left, 2nd window that user sees
 def learn_timer(rounds, time, break_time):
     h, m, s = time
     timer_win = Tk()
@@ -78,91 +154,73 @@ def learn_timer(rounds, time, break_time):
     seconds_label.grid(column=2, row=1, padx=5)
     pause_button = ttk.Button(
         timer_frame,
-        text="Pause",
-        command=lambda: pause(pause_button),
+        text="Start",
+        command=lambda: [
+            pause(pause_button),
+            countdown(
+                timer_win,
+                hours_label,
+                minutes_label,
+                seconds_label,
+                [int(h), int(m), int(s)],
+                break_time,
+                rounds,
+                "break",
+                [int(h), int(m), int(s)],
+            ),
+        ],
     )
     pause_button.grid(column=1, row=2, padx=5, pady=10)
-    countdown(
-        timer_win,
-        hours_label,
-        minutes_label,
-        seconds_label,
-        [int(h), int(m), int(s)],
-        break_time,
-        rounds,
-    )
     timer_win.mainloop()
 
 
-# Window in which you can set amount of rounds and learning and break time
-def menu():
-    menu = Tk()
-    menu.title("Pomodoro timer")
-
-    mainframe = ttk.Frame(menu)
+# Window in which you see break time, 3rd window that user sees
+def break_timer(break_time, rounds, learn_time):
+    break_win = Tk()
+    break_win.title("Break Time")
+    mainframe = ttk.Frame(break_win)
     mainframe.pack(expand="True", padx=36, pady=36)
-    rounds = StringVar(value=0)
-    hours = StringVar(value=0)
-    minutes = StringVar(value=0)
-    seconds = StringVar(value=0)
-    break_time = StringVar(value=0)
 
-    rounds_label = ttk.Label(mainframe, text="Number of rounds").pack()
-    rounds_entry = ttk.Entry(mainframe, textvariable=rounds, width="5").pack()
+    main_text = ttk.Label(mainframe, text="Break Time!").pack()
 
-    time_entry_frame = LabelFrame(mainframe, border=0, padx=10, pady=10)
-    time_entry_frame.pack()
-    time_label = ttk.Label(time_entry_frame, text="Learning time").grid(column=1, row=0)
-    hours_label = ttk.Label(time_entry_frame, text="hours").grid(column=0, row=1)
-    minutes_label = ttk.Label(time_entry_frame, text="minutes").grid(column=1, row=1)
-    seconds_label = ttk.Label(time_entry_frame, text="seconds").grid(column=2, row=1)
-    hours_entry = ttk.Spinbox(
-        time_entry_frame,
-        from_=0,
-        to=60,
-        width=5,
-        wrap=True,
-        textvariable=hours,
-        command=lambda: hours.set(hours.get()),
-    ).grid(column=0, row=2)
-    minutes_entry = ttk.Spinbox(
-        time_entry_frame,
-        from_=0,
-        to=60,
-        width=5,
-        wrap=True,
-        textvariable=minutes,
-        command=lambda: minutes.set(minutes.get()),
-    ).grid(column=1, row=2)
-    seconds_entry = ttk.Spinbox(
-        time_entry_frame,
-        from_=0,
-        to=60,
-        width=5,
-        wrap=True,
-        textvariable=seconds,
-        command=lambda: seconds.set(seconds.get()),
-    ).grid(column=2, row=2)
+    timer_frame = LabelFrame(mainframe, border=0, padx=0, pady=10)
+    timer_frame.pack()
+    hours_label = ttk.Label(timer_frame)  # Created because of need of argument
+    minutes_text = ttk.Label(timer_frame, text="Minutes").grid(column=0, row=0, padx=5)
+    seconds_text = ttk.Label(timer_frame, text="Seconds").grid(column=1, row=0, padx=5)
+    minutes_label = ttk.Label(timer_frame, text=break_time)
+    minutes_label.grid(column=0, row=1, padx=5)
+    seconds_label = ttk.Label(timer_frame, text="0")
+    seconds_label.grid(column=1, row=1, padx=5)
 
-    break_time_label = ttk.Label(mainframe, text="Break time").pack()
-    break_time_entry = ttk.Entry(mainframe, textvariable=break_time, width=5).pack()
-
-    submit_button = ttk.Button(
+    pause_button = ttk.Button(
         mainframe,
         text="Start",
         command=lambda: [
-            menu.destroy(),
-            learn_timer(
+            pause(pause_button),
+            countdown(
+                break_win,
+                hours_label,
+                minutes_label,
+                seconds_label,
+                [0, int(break_time), 0],
+                break_time,
                 rounds,
-                [hours.get(), minutes.get(), seconds.get()],
-                break_time.get(),
+                "learn",
+                learn_time,
             ),
-        ],
-    ).pack(pady=15)
-    mainloop()
+        ]
+        if pause_button["text"] == "Start"
+        else pause(pause_button),
+    )
+
+    pause_button.pack(pady=6)
+
+    break_win.mainloop()
 
 
 # TODO: Create Window with todo list, summary and GUI with all components working together
+# TODO: Validation of user inputs
 
 if __name__ == "__main__":
     menu()
