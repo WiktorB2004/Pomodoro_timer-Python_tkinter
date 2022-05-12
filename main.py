@@ -1,6 +1,8 @@
-# Imports
+# Tkinter Imports
 from tkinter import *
 from tkinter import ttk
+
+# Other imports
 import time
 
 # Countdown function
@@ -14,6 +16,7 @@ def countdown(
     rounds=1,
     sequence="",
     learn_time=[0, 1, 0],
+    is_paused=False,
 ):
     h, m, s = time_values
     try:
@@ -21,6 +24,7 @@ def countdown(
     except:
         raise ValueError("Please input valid value")
     while temp > -1:
+
         mins, secs = divmod(temp, 60)
         hours = 0
         if mins > 60:
@@ -39,14 +43,19 @@ def countdown(
                 break_timer(break_time, rounds, learn_time)
             elif int(rounds.get()) > 0 and sequence == "learn":
                 learn_timer(rounds, learn_time, break_time)
-        temp -= 1
+        if is_paused.get() == False:
+            temp -= 1
 
 
 # Pausing function
-def pause(btn):
-    if btn["text"] == "Unpause" or btn["text"] == "Start":
+def pause(btn, is_paused):
+    if btn["text"] == "Start":
         btn["text"] = "Pause"
-    else:
+    elif btn["text"] == "Unpause":
+        is_paused.set(not is_paused.get())
+        btn["text"] = "Pause"
+    elif btn["text"] == "Pause":
+        is_paused.set(not is_paused.get())
         btn["text"] = "Unpause"
 
 
@@ -122,6 +131,7 @@ def menu():
             ),
         ],
     ).pack(pady=15)
+
     menu.mainloop()
 
 
@@ -136,6 +146,7 @@ def learn_timer(rounds, time, break_time):
     hours = StringVar(value=h)
     minutes = StringVar(value=m)
     seconds = StringVar(value=s)
+    is_paused = BooleanVar(value=False)
 
     main_text = ttk.Label(mainframe, text="Counting down...").pack()
     rounds_text = ttk.Label(mainframe, text=f"Rounds left: {rounds.get()}").pack()
@@ -156,7 +167,7 @@ def learn_timer(rounds, time, break_time):
         timer_frame,
         text="Start",
         command=lambda: [
-            pause(pause_button),
+            pause(pause_button, is_paused),
             countdown(
                 timer_win,
                 hours_label,
@@ -167,8 +178,11 @@ def learn_timer(rounds, time, break_time):
                 rounds,
                 "break",
                 [int(h), int(m), int(s)],
+                is_paused,
             ),
-        ],
+        ]
+        if pause_button["text"] == "Start"
+        else pause(pause_button, is_paused),
     )
     pause_button.grid(column=1, row=2, padx=5, pady=10)
     timer_win.mainloop()
@@ -180,6 +194,8 @@ def break_timer(break_time, rounds, learn_time):
     break_win.title("Break Time")
     mainframe = ttk.Frame(break_win)
     mainframe.pack(expand="True", padx=36, pady=36)
+
+    is_paused = BooleanVar(value=False)
 
     main_text = ttk.Label(mainframe, text="Break Time!").pack()
 
@@ -197,7 +213,7 @@ def break_timer(break_time, rounds, learn_time):
         mainframe,
         text="Start",
         command=lambda: [
-            pause(pause_button),
+            pause(pause_button, is_paused),
             countdown(
                 break_win,
                 hours_label,
@@ -208,19 +224,21 @@ def break_timer(break_time, rounds, learn_time):
                 rounds,
                 "learn",
                 learn_time,
+                is_paused,
             ),
         ]
         if pause_button["text"] == "Start"
-        else pause(pause_button),
+        else pause(pause_button, is_paused),
     )
 
     pause_button.pack(pady=6)
-
     break_win.mainloop()
 
 
 # TODO: Create Window with todo list, summary and GUI with all components working together
 # TODO: Validation of user inputs
+# TODO: Kill the app on exit event
+
 
 if __name__ == "__main__":
     menu()
