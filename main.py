@@ -1,16 +1,44 @@
 # Imports
 from tkinter import *
 from tkinter import ttk
+import time
 
 
 # Window in which you see break time
-def break_timer():
+def break_timer(break_time, rounds):
     pass
 
 
 # Countdown function
-def countdown(hours_label, minutes_label, seconds_label, h, m, s):
-    pass
+def countdown(
+    win, hours_label, minutes_label, seconds_label, time_values, break_time, rounds
+):
+    h, m, s = time_values
+    try:
+        # the input provided by the user is
+        # stored in here :temp
+        temp = h * 3600 + m * 60 + s
+    except:
+        raise ValueError("Please input valid value")
+    while temp > -1:
+        mins, secs = divmod(temp, 60)
+        hours = 0
+        if mins > 60:
+            hours, mins = divmod(mins, 60)
+
+        hours_label["text"] = hours
+        minutes_label["text"] = mins
+        seconds_label["text"] = secs
+
+        win.update()
+        time.sleep(1)
+
+        if temp == 0:
+            win.destroy()
+            rounds.set(int(rounds.get()) - 1)
+            break_timer(break_time, rounds)
+
+        temp -= 1
 
 
 # Pausing button function
@@ -34,7 +62,7 @@ def learn_timer(rounds, time, break_time):
     seconds = StringVar(value=s)
 
     main_text = ttk.Label(mainframe, text="Counting down...").pack()
-    rounds_text = ttk.Label(mainframe, text=f"Rounds left: {rounds}").pack()
+    rounds_text = ttk.Label(mainframe, text=f"Rounds left: {rounds.get()}").pack()
 
     timer_frame = LabelFrame(mainframe, border=0, padx=0, pady=0)
     timer_frame.pack()
@@ -54,7 +82,15 @@ def learn_timer(rounds, time, break_time):
         command=lambda: pause(pause_button),
     )
     pause_button.grid(column=1, row=2, padx=5, pady=10)
-    countdown(hours_label, minutes_label, seconds_label, h, m, s)
+    countdown(
+        timer_win,
+        hours_label,
+        minutes_label,
+        seconds_label,
+        [int(h), int(m), int(s)],
+        break_time,
+        rounds,
+    )
     timer_win.mainloop()
 
 
@@ -117,7 +153,7 @@ def menu():
         command=lambda: [
             menu.destroy(),
             learn_timer(
-                rounds.get(),
+                rounds,
                 [hours.get(), minutes.get(), seconds.get()],
                 break_time.get(),
             ),
