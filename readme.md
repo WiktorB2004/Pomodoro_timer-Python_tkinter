@@ -6,10 +6,11 @@ Application includes:
 
 **In future:**
 
-- Responsive GUI
+- Responsive GUI and more styling
 - TODO list
 - Summary of the learning time and completed todos while learning
 - Validation of user inputs
+- I will review the code and make sure that its clear, well commented and if needed I will refactor it
 
 ## Idea of the project
 
