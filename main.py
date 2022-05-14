@@ -20,9 +20,9 @@ def countdown(
 ):
     h, m, s = time_values
     try:
-        temp = h * 3600 + m * 60 + s
+        temp = int(h) * 3600 + int(m) * 60 + int(s)
     except:
-        raise ValueError("Please input valid value")
+        raise ValueError("Wrong values entered")
     while temp > -1:
 
         mins, secs = divmod(temp, 60)
@@ -59,6 +59,13 @@ def pause(btn, is_paused):
         btn["text"] = "Unpause"
 
 
+# Function that checks if user time input is valid
+def validate_time_entry(input):
+    if input.isnumeric():
+        return True
+    return False
+
+
 # Window in which user can set amount of rounds,learning time and break time, 1st window that user sees
 def menu():
     menu = Tk()
@@ -74,8 +81,17 @@ def menu():
 
     rounds_label = ttk.Label(mainframe, text="Number of rounds").pack()
     rounds_entry = ttk.Entry(
-        mainframe, textvariable=rounds, width=4, justify="center"
-    ).pack()
+        mainframe,
+        textvariable=rounds,
+        width=4,
+        justify="center",
+        validate="key",
+    )
+    rounds_entry["validatecommand"] = (
+        rounds_entry.register(validate_time_entry),
+        "%P",
+    )
+    rounds_entry.pack()
 
     time_entry_frame = LabelFrame(mainframe, border=0, padx=10, pady=10)
     time_entry_frame.pack()
@@ -92,7 +108,13 @@ def menu():
         textvariable=hours,
         command=lambda: hours.set(hours.get()),
         justify="center",
-    ).grid(column=0, row=2)
+        validate="key",
+    )
+    hours_entry["validatecommand"] = (
+        hours_entry.register(validate_time_entry),
+        "%P",
+    )
+    hours_entry.grid(column=0, row=2)
     minutes_entry = ttk.Spinbox(
         time_entry_frame,
         from_=0,
@@ -102,7 +124,13 @@ def menu():
         textvariable=minutes,
         command=lambda: minutes.set(minutes.get()),
         justify="center",
-    ).grid(column=1, row=2)
+        validate="key",
+    )
+    minutes_entry["validatecommand"] = (
+        minutes_entry.register(validate_time_entry),
+        "%P",
+    )
+    minutes_entry.grid(column=1, row=2)
     seconds_entry = ttk.Spinbox(
         time_entry_frame,
         from_=0,
@@ -112,12 +140,27 @@ def menu():
         textvariable=seconds,
         command=lambda: seconds.set(seconds.get()),
         justify="center",
-    ).grid(column=2, row=2)
+        validate="key",
+    )
+    seconds_entry["validatecommand"] = (
+        seconds_entry.register(validate_time_entry),
+        "%P",
+    )
+    seconds_entry.grid(column=2, row=2)
 
     break_time_label = ttk.Label(mainframe, text="Break time (minutes)").pack()
     break_time_entry = ttk.Entry(
-        mainframe, textvariable=break_time, width=5, justify="center"
-    ).pack()
+        mainframe,
+        textvariable=break_time,
+        width=5,
+        justify="center",
+        validate="key",
+    )
+    break_time_entry["validatecommand"] = (
+        break_time_entry.register(validate_time_entry),
+        "%P",
+    )
+    break_time_entry.pack()
 
     submit_button = ttk.Button(
         mainframe,
@@ -173,11 +216,11 @@ def learn_timer(rounds, time, break_time):
                 hours_label,
                 minutes_label,
                 seconds_label,
-                [int(h), int(m), int(s)],
+                [h, m, s],
                 break_time,
                 rounds,
                 "break",
-                [int(h), int(m), int(s)],
+                [h, m, s],
                 is_paused,
             ),
         ]
@@ -219,7 +262,7 @@ def break_timer(break_time, rounds, learn_time):
                 hours_label,
                 minutes_label,
                 seconds_label,
-                [0, int(break_time), 0],
+                [0, break_time, 0],
                 break_time,
                 rounds,
                 "learn",
@@ -235,9 +278,9 @@ def break_timer(break_time, rounds, learn_time):
     break_win.mainloop()
 
 
-# TODO: Create Window with todo list, summary and GUI with all components working together
-# TODO: Validation of user inputs
-# TODO: Kill the app on exit event
+# TODO: Create Window with todo list and summary
+# TODO: Solve some error thrown when closing on timer
+# *TODO: Make GUI responsive
 
 
 if __name__ == "__main__":
