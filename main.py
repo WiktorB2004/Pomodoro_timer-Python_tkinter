@@ -1,6 +1,7 @@
 # Tkinter Imports
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
 
 # Other imports
 import time
@@ -70,7 +71,7 @@ def validate_time_entry(input):
 def menu():
     menu = Tk()
     menu.title("Pomodoro timer")
-
+    menu.resizable(width=False, height=False)
     mainframe = ttk.Frame(menu)
     mainframe.pack(expand="True", padx=36, pady=36)
     rounds = StringVar(value=1)
@@ -78,6 +79,7 @@ def menu():
     minutes = StringVar(value=0)
     seconds = StringVar(value=0)
     break_time = StringVar(value=1)
+    enable_todo = BooleanVar(value=False)
 
     rounds_label = ttk.Label(mainframe, text="Number of rounds").pack()
     rounds_entry = ttk.Entry(
@@ -162,6 +164,15 @@ def menu():
     )
     break_time_entry.pack()
 
+    todo_list_button = ttk.Checkbutton(
+        mainframe,
+        text="Enable todo list",
+        onvalue=True,
+        offvalue=False,
+        variable=enable_todo,
+    )
+    todo_list_button.pack(pady=(15, 0))
+
     submit_button = ttk.Button(
         mainframe,
         text="Start",
@@ -171,6 +182,7 @@ def menu():
                 rounds,
                 [hours.get(), minutes.get(), seconds.get()],
                 break_time.get(),
+                enable_todo,
             ),
         ],
     ).pack(pady=15)
@@ -179,10 +191,11 @@ def menu():
 
 
 # Window in which you see countdown and rounds left, 2nd window that user sees
-def learn_timer(rounds, time, break_time):
+def learn_timer(rounds, time, break_time, enable_todo):
     h, m, s = time
     timer_win = Tk()
     timer_win.title("Timer")
+    timer_win.resizable(width=False, height=False)
     mainframe = ttk.Frame(timer_win)
     mainframe.pack(expand="True", padx=36, pady=36)
 
@@ -228,6 +241,10 @@ def learn_timer(rounds, time, break_time):
         else pause(pause_button, is_paused),
     )
     pause_button.grid(column=1, row=2, padx=5, pady=10)
+
+    if enable_todo.get():
+        todo_list()
+
     timer_win.mainloop()
 
 
@@ -235,6 +252,7 @@ def learn_timer(rounds, time, break_time):
 def break_timer(break_time, rounds, learn_time):
     break_win = Tk()
     break_win.title("Break Time")
+    break_win.resizable(width=False, height=False)
     mainframe = ttk.Frame(break_win)
     mainframe.pack(expand="True", padx=36, pady=36)
 
@@ -278,7 +296,88 @@ def break_timer(break_time, rounds, learn_time):
     break_win.mainloop()
 
 
-# TODO: Create Window with todo list and summary
+# Todo list functions
+def newTask(lb, entry):
+    task = entry.get()
+    if task != "":
+        lb.insert(END, task)
+        entry.delete(0, "end")
+    else:
+        messagebox.showwarning("warning", "Please enter some task.")
+
+
+def deleteTask(lb):
+    lb.delete(ANCHOR)
+
+
+# Todo list window and todo list handling
+def todo_list():
+    todo_win = Tk()
+    todo_win.geometry("500x450")
+    todo_win.title("Todo list")
+    todo_win.config(bg="#223441")
+    todo_win.resizable(width=False, height=False)
+
+    frame = Frame(todo_win)
+    frame.pack(pady=10)
+
+    lb = Listbox(
+        frame,
+        width=25,
+        height=8,
+        font=("Times", 18),
+        bd=0,
+        fg="#464646",
+        highlightthickness=0,
+        selectbackground="#a6a6a6",
+        activestyle="none",
+    )
+    lb.pack(side=LEFT, fill=BOTH)
+
+    task_list = []
+
+    for item in task_list:
+        lb.insert(END, item)
+
+    sb = Scrollbar(frame)
+    sb.pack(side=RIGHT, fill=BOTH)
+
+    lb.config(yscrollcommand=sb.set)
+    sb.config(command=lb.yview)
+
+    my_entry = Entry(todo_win, font=("times", 24))
+
+    my_entry.pack(pady=20)
+
+    button_frame = Frame(todo_win)
+    button_frame.pack(pady=20)
+
+    addTask_btn = Button(
+        button_frame,
+        text="Add Task",
+        font=("times 14"),
+        bg="#c5f776",
+        padx=20,
+        pady=10,
+        command=lambda: newTask(lb, my_entry),
+    )
+    addTask_btn.pack(fill=BOTH, expand=True, side=LEFT)
+
+    delTask_btn = Button(
+        button_frame,
+        text="Delete Task",
+        font=("times 14"),
+        bg="#ff8b61",
+        padx=20,
+        pady=10,
+        command=lambda: deleteTask(lb),
+    )
+    delTask_btn.pack(fill=BOTH, expand=True, side=LEFT)
+
+    todo_win.mainloop()
+
+
+# TODO: Create Window with todo list and summary -> 1/2
 # TODO: Solve some error thrown when closing on timer
 # *TODO: Make GUI responsive
 
