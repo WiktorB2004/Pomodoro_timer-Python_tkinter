@@ -310,7 +310,7 @@ def deleteTask(lb):
     lb.delete(ANCHOR)
 
 
-# Todo list window and todo list handling
+# Todo list window and todo list handling -> Implemented basing at code from pythonguides.com
 def todo_list():
     todo_win = Tk()
     todo_win.geometry("500x450")
