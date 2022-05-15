@@ -7,7 +7,7 @@ Application includes:
 **In future:**
 
 - Responsive GUI and more styling
-- TODO list
+- ~~TODO list~~
 - Summary of the learning time and completed todos while learning.
 - ~~Validation of user inputs~~
 - I will review the code and make sure that its clear, well commented and if needed I will refactor it
