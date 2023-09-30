@@ -13,7 +13,7 @@ Application includes:
 - ~~Validation of user inputs~~
 - I will review the code and make sure that its clear, well commented and if needed I will refactor it
 
-## Demo video - delays are caused by refreshing the timer (need to repair)
+## Demo video - delays are caused by refreshing the timer (need to repair by using threading)
 https://user-images.githubusercontent.com/62223421/168488660-54a6607f-d7af-4010-9b68-1c8544bf0dfd.mp4
 
 
